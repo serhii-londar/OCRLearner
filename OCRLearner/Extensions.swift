@@ -19,11 +19,11 @@ extension UIImage {
         
         let trainImagesData = UIImagePNGRepresentation(self) // UIImageJPEGRepresentation(self, 1.0)
         // Extract training image pixels
-        var trainPixelsArray = [UInt8](count: numPixels, repeatedValue: 0)
-        trainImagesData!.getBytes(&trainPixelsArray, range: NSMakeRange(0, numPixels)) //length: numPixels)
+        var trainPixelsArray = [UInt8](repeating: 0, count: numPixels)
+        (trainImagesData! as NSData).getBytes(&trainPixelsArray, range: NSMakeRange(0, numPixels)) //length: numPixels)
         // Convert pixels to Floats
-        var trainPixelsFloatArray = [Float](count: numPixels, repeatedValue: 0)
-        for (index, pixel) in trainPixelsArray.enumerate() {
+        var trainPixelsFloatArray = [Float](repeating: 0, count: numPixels)
+        for (index, pixel) in trainPixelsArray.enumerated() {
             trainPixelsFloatArray[index] = Float(pixel) / 255 // Normalize pixel value
         }
         return Array(trainPixelsFloatArray[80...trainPixelsFloatArray.count-1])
@@ -32,33 +32,33 @@ extension UIImage {
     // Get grayscale image from normal image.
     
     func getGrayScale() -> UIImage? {
-        let inImage:CGImageRef = self.CGImage!
+        let inImage:CGImage = self.cgImage!
         let context = self.createARGBBitmapContextFromImage(inImage)
-        let pixelsWide = CGImageGetWidth(inImage)
-        let pixelsHigh = CGImageGetHeight(inImage)
+        let pixelsWide = inImage.width
+        let pixelsHigh = inImage.height
         let rect = CGRect(x:0, y:0, width:Int(pixelsWide), height:Int(pixelsHigh))
         
         let bitmapBytesPerRow = Int(pixelsWide) * 4
         let bitmapByteCount = bitmapBytesPerRow * Int(pixelsHigh)
         
         //Clear the context
-        CGContextClearRect(context, rect)
+        context?.clear(rect)
         
         // Draw the image to the bitmap context. Once we draw, the memory
         // allocated for the context for rendering will then contain the
         // raw image data in the specified color space.
-        CGContextDrawImage(context, rect, inImage)
+        context?.draw(inImage, in: rect)
         
         // Now we can get a pointer to the image data associated with the bitmap
         // context.
         
         
-        let data = CGBitmapContextGetData(context)
+        let data = context?.data
         let dataType = UnsafeMutablePointer<UInt8>(data)
-        let point: CGPoint = CGPointMake(0, 0)
+        let point: CGPoint = CGPoint(x: 0, y: 0)
         
-        for var x = 0; x < Int(pixelsWide) ; x++ {
-            for var y = 0; y < Int(pixelsHigh) ; y++ {
+        for x in 0 ..< Int(pixelsWide) {
+            for y in 0 ..< Int(pixelsHigh) {
                 let offset = 4*((Int(pixelsWide) * Int(y)) + Int(x))
                 let alpha = dataType[offset]
                 let red = dataType[offset+1]
@@ -74,18 +74,18 @@ extension UIImage {
         }
         
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue)
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
         
-        let finalcontext = CGBitmapContextCreate(data, pixelsWide, pixelsHigh, 8,  bitmapBytesPerRow, colorSpace, bitmapInfo.rawValue)
+        let finalcontext = CGContext(data: data, width: pixelsWide, height: pixelsHigh, bitsPerComponent: 8,  bytesPerRow: bitmapBytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
         
-        let imageRef = CGBitmapContextCreateImage(finalcontext)
-        return UIImage(CGImage: imageRef!, scale: self.scale,orientation: self.imageOrientation)
+        let imageRef = finalcontext?.makeImage()
+        return UIImage(cgImage: imageRef!, scale: self.scale,orientation: self.imageOrientation)
     }
     
-    public func createARGBBitmapContextFromImage(inImage: CGImageRef) -> CGContextRef? {
+    public func createARGBBitmapContextFromImage(_ inImage: CGImage) -> CGContext? {
         
-        let width = CGImageGetWidth(inImage)
-        let height = CGImageGetHeight(inImage)
+        let width = inImage.width
+        let height = inImage.height
         
         let bitmapBytesPerRow = width * 4
         let bitmapByteCount = bitmapBytesPerRow * height
@@ -100,13 +100,13 @@ extension UIImage {
             return nil
         }
         
-        let context = CGBitmapContextCreate (bitmapData,
-            width,
-            height,
-            8,      // bits per component
-            bitmapBytesPerRow,
-            colorSpace,
-            CGImageAlphaInfo.PremultipliedFirst.rawValue)
+        let context = CGContext (data: bitmapData,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,      // bits per component
+            bytesPerRow: bitmapBytesPerRow,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
         
         return context
     }
@@ -119,39 +119,39 @@ extension UIImage {
         return character
     }
     
-    public func cropImage(image: UIImage, toRect: CGRect) -> UIImage {
-        let imageRef = CGImageCreateWithImageInRect(image.CGImage!, toRect)
-        let newImage = UIImage(CGImage: imageRef!)
+    public func cropImage(_ image: UIImage, toRect: CGRect) -> UIImage {
+        let imageRef = image.cgImage!.cropping(to: toRect)
+        let newImage = UIImage(cgImage: imageRef!)
         return newImage
     }
     
-    public func scaleImageToSize(image: UIImage, maxLength: CGFloat) -> UIImage {
+    public func scaleImageToSize(_ image: UIImage, maxLength: CGFloat) -> UIImage {
         let size = CGSize(width: min(maxLength * image.size.width / image.size.height, maxLength), height: min(maxLength * image.size.height / image.size.width, maxLength))
-        let newRect = CGRectIntegral(CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        let newRect = CGRect(x: 0, y: 0, width: size.width, height: size.height).integral
         UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
         let context = UIGraphicsGetCurrentContext()
-        CGContextSetInterpolationQuality(context, CGInterpolationQuality.None)
-        image.drawInRect(newRect)
+        context!.interpolationQuality = CGInterpolationQuality.none
+        image.draw(in: newRect)
         
-        let newImageRef = CGBitmapContextCreateImage(context)! as CGImageRef
-        let newImage = UIImage(CGImage: newImageRef, scale: 1.0, orientation: UIImageOrientation.Up)
+        let newImageRef = (context?.makeImage()!)! as CGImage
+        let newImage = UIImage(cgImage: newImageRef, scale: 1.0, orientation: UIImageOrientation.up)
         UIGraphicsEndImageContext()
         
         return newImage
     }
     
     
-    public func addBorderToImage(image: UIImage) -> UIImage {
+    public func addBorderToImage(_ image: UIImage) -> UIImage {
         let width = 28
         let height = 28
         
         UIGraphicsBeginImageContext(CGSize(width: width, height: height))
         let white = UIImage(named: "white")!
-        white.drawAtPoint(CGPointZero)
-        image.drawAtPoint(CGPointMake((CGFloat(width) - image.size.width) / 2, (CGFloat(height) - image.size.height) / 2))
+        white.draw(at: CGPoint.zero)
+        image.draw(at: CGPoint(x: (CGFloat(width) - image.size.width) / 2, y: (CGFloat(height) - image.size.height) / 2))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return newImage
+        return newImage!
     }
 }
 

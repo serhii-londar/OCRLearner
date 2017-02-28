@@ -15,32 +15,32 @@ class HandwritingTrainerChar {
     
     var network = FFNN(inputs: 704, hidden: 20, outputs: 6)
     
-    private var trainingImages = [[Float]] ()
-    private var trainingLabels = [[Float]] ()
-    private var validationImages = [[Float]] ()
-    private var validationLabels = [[Float]] ()
+    fileprivate var trainingImages = [[Float]] ()
+    fileprivate var trainingLabels = [[Float]] ()
+    fileprivate var validationImages = [[Float]] ()
+    fileprivate var validationLabels = [[Float]] ()
     
     // Correspond to number in sample folder
     // Only train network on A, B, C, D, J, and R
     
     internal enum Label: Int {
-        case A = 11
-        case B = 12
-        case C = 13
-        case D = 14
-        case J = 20
-        case R = 28
+        case a = 11
+        case b = 12
+        case c = 13
+        case d = 14
+        case j = 20
+        case r = 28
         
     }
     
-    let labelEnums = [Label.A, Label.B, Label.C, Label.D, Label.J, Label.R]
+    let labelEnums = [Label.a, Label.b, Label.c, Label.d, Label.j, Label.r]
     
     func constructNetwork() {
         
         for i in 0...labelEnums.count - 1 { // Iterate through all chacters
             print("Char: \(labelEnums[i])")
             let sampleName = "img0" + labelEnums[i].rawValue.stringRep() + "-0"
-            let start = NSDate();
+            let start = Date();
             
             // Train 55 samples of each character
             for j in 1...55 {
@@ -57,8 +57,8 @@ class HandwritingTrainerChar {
                 }
             }
             
-            let end = NSDate();   // <<<<<<<<<<   end time
-            let timeInterval: Double = end.timeIntervalSinceDate(start); // <<<<< Difference in seconds (double)
+            let end = Date();   // <<<<<<<<<<   end time
+            let timeInterval: Double = end.timeIntervalSince(start); // <<<<< Difference in seconds (double)
             print("Time for num \(labelEnums[i]): \(timeInterval) seconds");
             
         }
@@ -75,16 +75,16 @@ class HandwritingTrainerChar {
         // network.writeToFile(filePath)
     }
     
-    private func labelToArray(label: Int, numberOfClasses: Int) -> [Float] {
-        var answer = [Float](count: numberOfClasses, repeatedValue: 0)
+    fileprivate func labelToArray(_ label: Int, numberOfClasses: Int) -> [Float] {
+        var answer = [Float](repeating: 0, count: numberOfClasses)
         answer[Int(label)] = 1
         return answer
     }
     
-    func outputToLabel(output: [Float]) -> (label: Int, confidence: Double)? {
-        guard let max = output.maxElement() else {
+    func outputToLabel(_ output: [Float]) -> (label: Int, confidence: Double)? {
+        guard let max = output.max() else {
             return nil
         }
-        return (output.indexOf(max)!, Double(max / 1.0))
+        return (output.index(of: max)!, Double(max / 1.0))
     }
 }

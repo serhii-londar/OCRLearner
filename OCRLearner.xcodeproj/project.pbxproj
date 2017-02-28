@@ -10894,6 +10894,7 @@
 					23832B331CA2EB6100EBE252 = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = 78T7FXCULR;
+						LastSwiftMigration = 0820;
 					};
 				};
 			};
@@ -14472,6 +14473,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.rosenstein.OCRLearner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -14483,6 +14485,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.rosenstein.OCRLearner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

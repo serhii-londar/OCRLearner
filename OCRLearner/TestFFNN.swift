@@ -15,7 +15,7 @@ class TestFFNN {
     
     init() {
         self.ocr = HandwritingTrainerChar()
-        let filePath = NSURL(fileURLWithPath: "/Users/rosenstein/Documents/Sam/SP16/CSE5523/MLProject/iOSProjects/OCRLearner/OCRLearner").URLByAppendingPathComponent("char-ffnn-trained")
+        let filePath = URL(fileURLWithPath: "/Users/rosenstein/Documents/Sam/SP16/CSE5523/MLProject/iOSProjects/OCRLearner/OCRLearner").appendingPathComponent("char-ffnn-trained")
         self.ocr.network = FFNN.fromFile(filePath)!
         
         print("here")
@@ -27,7 +27,7 @@ class TestFFNN {
         testR1()
     }
     
-    func testImage(image: UIImage, expectedLabel: HandwritingTrainerChar.Label) {
+    func testImage(_ image: UIImage, expectedLabel: HandwritingTrainerChar.Label) {
         
         let imageData = image.floatRepresentation()
         do {
@@ -48,41 +48,41 @@ class TestFFNN {
     func testA1() {
         
         let image = UIImage(named: "img011-001.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.A)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.a)
         
     }
     
     func testB1() {
         
         let image = UIImage(named: "img012-001.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.B)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.b)
         
     }
     
     func testC1() {
         
         let image = UIImage(named: "img013-001.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.C)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.c)
         
     }
     
     func testD1() {
         
         let image = UIImage(named: "img014-001.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.D)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.d)
         
     }
     
     func testJ1() {
         
         let image = UIImage(named: "img020-011.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.J)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.j)
     }
     
     func testR1() {
         
         let image = UIImage(named: "img028-011.png")
-        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.R)
+        testImage(image!, expectedLabel: HandwritingTrainerChar.Label.r)
         
     }
     
