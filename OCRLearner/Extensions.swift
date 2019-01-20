@@ -17,7 +17,7 @@ extension UIImage {
         let numPixels = Int((image?.size.width)!) * Int((image?.size.height)!)
         
         
-        let trainImagesData = UIImagePNGRepresentation(self) // UIImageJPEGRepresentation(self, 1.0)
+        let trainImagesData = self.pngData() // UIImageJPEGRepresentation(self, 1.0)
         // Extract training image pixels
         var trainPixelsArray = [UInt8](repeating: 0, count: numPixels)
         (trainImagesData! as NSData).getBytes(&trainPixelsArray, range: NSMakeRange(0, numPixels)) //length: numPixels)
@@ -97,7 +97,7 @@ extension UIImage {
         image.draw(in: newRect)
         
         let newImageRef = (context?.makeImage()!)! as CGImage
-        let newImage = UIImage(cgImage: newImageRef, scale: 1.0, orientation: UIImageOrientation.up)
+        let newImage = UIImage(cgImage: newImageRef, scale: 1.0, orientation: UIImage.Orientation.up)
         UIGraphicsEndImageContext()
         
         return newImage
