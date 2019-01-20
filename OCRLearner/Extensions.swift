@@ -12,7 +12,7 @@ extension UIImage {
     
     public func floatRepresentation() -> [Float] {
         let preImage = self.getGrayScale()
-        let image = preImage!.shrinkImage()
+        let image = preImage.shrinkImage()
         
         let numPixels = Int((image?.size.width)!) * Int((image?.size.height)!)
         
@@ -31,56 +31,19 @@ extension UIImage {
     
     // Get grayscale image from normal image.
     
-    func getGrayScale() -> UIImage? {
-        let inImage:CGImage = self.cgImage!
-        let context = self.createARGBBitmapContextFromImage(inImage)
-        let pixelsWide = inImage.width
-        let pixelsHigh = inImage.height
-        let rect = CGRect(x:0, y:0, width:Int(pixelsWide), height:Int(pixelsHigh))
-        
-        let bitmapBytesPerRow = Int(pixelsWide) * 4
-        let bitmapByteCount = bitmapBytesPerRow * Int(pixelsHigh)
-        
-        //Clear the context
-        context?.clear(rect)
-        
-        // Draw the image to the bitmap context. Once we draw, the memory
-        // allocated for the context for rendering will then contain the
-        // raw image data in the specified color space.
-        context?.draw(inImage, in: rect)
-        
-        // Now we can get a pointer to the image data associated with the bitmap
-        // context.
-        
-        
-        let data = context?.data
-        let dataType = UnsafeMutablePointer<UInt8>(data)
-        let point: CGPoint = CGPoint(x: 0, y: 0)
-        
-        for x in 0 ..< Int(pixelsWide) {
-            for y in 0 ..< Int(pixelsHigh) {
-                let offset = 4*((Int(pixelsWide) * Int(y)) + Int(x))
-                let alpha = dataType[offset]
-                let red = dataType[offset+1]
-                let green = dataType[offset+2]
-                let blue = dataType[offset+3]
-                
-                let avg = (UInt32(red) + UInt32(green) + UInt32(blue))/3
-                
-                dataType[offset + 1] = UInt8(avg)
-                dataType[offset + 2] = UInt8(avg)
-                dataType[offset + 3] = UInt8(avg)
-            }
+    func getGrayScale() -> UIImage {
+            let imageRect = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height)//(origin: , size: );
+            let colorSpace = CGColorSpaceCreateDeviceGray();
+            
+            let width = UInt(self.size.width)
+            let height = UInt(self.size.height)
+            let context = CGContext(data: nil, width: Int(width), height: Int(height), bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: .allZeros);
+//            CGContextDrawImage(context, , .CGImage!);
+            context?.draw(self.cgImage!, in: imageRect)
+            let imageRef = context!.makeImage();
+            let newImage = UIImage(cgImage: imageRef!)
+            return newImage
         }
-        
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-        
-        let finalcontext = CGContext(data: data, width: pixelsWide, height: pixelsHigh, bitsPerComponent: 8,  bytesPerRow: bitmapBytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
-        
-        let imageRef = finalcontext?.makeImage()
-        return UIImage(cgImage: imageRef!, scale: self.scale,orientation: self.imageOrientation)
-    }
     
     public func createARGBBitmapContextFromImage(_ inImage: CGImage) -> CGContext? {
         

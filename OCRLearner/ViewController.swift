@@ -14,11 +14,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         // Train and save a FFNN (uncomment to run)
-        // let ocr = HandwritingTrainerChar()
-        // ocr.constructNetwork()
+         let ocr = HandwritingTrainerChar()
+         ocr.constructNetwork()
         
         // Run the tests for the contructed FFNN
-        // TestFFNN()
+         TestFFNN()
         
         
     }
